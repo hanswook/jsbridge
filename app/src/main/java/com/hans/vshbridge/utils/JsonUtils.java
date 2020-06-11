@@ -1,4 +1,4 @@
-package com.hans.vshbridge;
+package com.hans.vshbridge.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

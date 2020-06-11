@@ -26,9 +26,12 @@
             setTimeout(jsfunc);
         }
 
+        function doSth(params) {
+            vsh.log("doSth:" + params.data);
+        }
+
         function callNativeTest() {
-            vsh.callNative(JSON.stringify(msg));
-            callNativeTest(
+            callNative(
                 "hans://demo/log", {
                     text: "this is callNative demo/log content",
                 },
@@ -81,7 +84,7 @@
     <h1>44</h1>
     <h1>33</h1>
     <h1>22</h1>
-    <button type="button" id="button1" onclick="callNative()">
+    <button type="button" id="button1" onclick="callNativeTest()">
       <h1>clickme</h1>
     </button>
 </body>

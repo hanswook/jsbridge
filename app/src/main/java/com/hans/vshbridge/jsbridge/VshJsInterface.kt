@@ -1,14 +1,11 @@
-package com.hans.vshbridge;
+package com.hans.vshbridge.jsbridge;
 
 import android.app.Activity
-import android.content.Context
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
-import com.hans.vshbridge.jsbridge.JsCallbackCenter
-import com.hans.vshbridge.jsbridge.JsFunctionHandler
-import com.hans.vshbridge.jsbridge.JsNativeCenter
+import com.hans.vshbridge.utils.JsonUtils
 
 /**
  * @date: 2020/6/10 6:32 PM
@@ -49,15 +46,6 @@ class VshJsInterface(val context: Activity, val webview: WebView) : Object() {
                 }
             })
         println("data:$data")
-    }
-
-    @JavascriptInterface
-    fun dispatchMessageFromJs(msg: String) {
-        val data = JsonUtils.fromJsonString<JsFunctionParams>(msg, JsFunctionParams::class.java)
-            ?: return
-        val findCallback = JsCallbackCenter.findCallback(data.callbackId) ?: return
-        findCallback.handler(msg)
-
     }
 
     @JavascriptInterface

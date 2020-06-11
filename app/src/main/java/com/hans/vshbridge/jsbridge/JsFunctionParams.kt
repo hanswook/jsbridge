@@ -1,4 +1,4 @@
-package com.hans.vshbridge
+package com.hans.vshbridge.jsbridge
 
 /**
  *

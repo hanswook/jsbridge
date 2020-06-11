@@ -7,19 +7,19 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.hans.vshbridge.jsbridge.JsCallbackCenter
-import com.hans.vshbridge.jsbridge.JsFunction
-import com.hans.vshbridge.jsbridge.JsFunctionHandler
-import com.hans.vshbridge.jsbridge.JsNativeCenter
+import com.hans.vshbridge.jsbridge.*
+import com.hans.vshbridge.utils.JsonUtils
 
 class MainActivity : AppCompatActivity() {
 
-    private val webview = findViewById<WebView>(R.id.webview)
+    private var webview: WebView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val settings = webview.settings
+        webview = findViewById<WebView>(R.id.webview) ?: return
+
+        val settings = webview!!.settings
         settings.javaScriptEnabled = true;
         settings.useWideViewPort = true;
         settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
@@ -27,8 +27,13 @@ class MainActivity : AppCompatActivity() {
         settings.setAppCacheEnabled(false)
         settings.cacheMode = WebSettings.LOAD_NO_CACHE
         settings.loadWithOverviewMode = true
-        webview.loadUrl("http://10.237.209.160:9080/web/vshbridge.html")
-        webview.addJavascriptInterface(VshJsInterface(this, webview), "vsh")
+        webview?.loadUrl("http://10.237.209.160:9080/web/vshbridge.html")
+        webview?.addJavascriptInterface(
+            VshJsInterface(
+                this,
+                webview!!
+            ), "vsh"
+        )
 
         JsNativeCenter.instance.registFunction("hans://demo/log", object : JsFunction {
             override fun invoke(
@@ -43,27 +48,17 @@ class MainActivity : AppCompatActivity() {
         })
 
         findViewById<TextView>(R.id.tvOne).setOnClickListener {
-            val func = JsFunctionParams()
-            func.handlerName = "doSth"
-            var normalData = NormalData("showshowshow")
-            func.data = normalData
-            var json = JsonUtils.toJsonString(func)
-            //escape special characters for json string
-            webview.evaluateJavascript(
-                "javascript:callJS($json)"
-            ) { }
+            callHandler("doSth", NormalData("showshowshow"))
         }
     }
 
 
-    fun callHandler(handlerName: String, params: String, jsFunctionHandler: JsFunctionHandler) {
+    private fun callHandler(handlerName: String, params: Any) {
         val func = JsFunctionParams()
         func.handlerName = handlerName
         func.data = params
-        func.callbackId= JsCallbackCenter.uniqueId++.toString();
         var json = JsonUtils.toJsonString(func)
-        JsCallbackCenter.addFunction(func.callbackId,jsFunctionHandler)
-        webview.evaluateJavascript(
+        webview?.evaluateJavascript(
             "javascript:callJS($json)"
         ) { }
     }

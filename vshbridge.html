@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Welcome to nginx!</title>
+    <style>
+        body {
+            width: 35em;
+            margin: 0 auto;
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+        }
+    </style>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <script>
+        let uniqueId = 0;
+        let callbacksFromNative = {};
+
+        /**
+         * native 调用 js 的方法，暂时不添加回调方法，作为单向调用。
+         */
+        function callJS(messageJson) {
+            vsh.log(JSON.stringify(messageJson));
+            let func = messageJson.handlerName;
+            let data = messageJson.data;
+            let jsfunc = func + "(" + JSON.stringify(data) + ")";
+            setTimeout(jsfunc);
+        }
+
+        function callNativeTest() {
+            vsh.callNative(JSON.stringify(msg));
+            callNativeTest(
+                "hans://demo/log", {
+                    text: "this is callNative demo/log content",
+                },
+                function(params) {
+                    vsh.log("callNativeTest callback params:" + params);
+                }
+            );
+        }
+
+        /**
+         * 处理js调用native后，native回调结果
+         * */
+        // {"callbackId":"13","data":"this is return data from demo log","handlerName":"hans://demo/log"}
+        function dispatchMessageFromNative(msg) {
+            let callback = callbacksFromNative[msg.callbackId];
+            callback(msg.data);
+            vsh.log("dispatchMessageFromNative:" + JSON.stringify(msg));
+        }
+        /**
+         * js 调用native
+         */
+        function callNative(handlerName, data, callback) {
+            let msg = {
+                handlerName: handlerName,
+                data: data,
+                callbackId: uniqueId++,
+            };
+            callbacksFromNative[msg.callbackId] = callback;
+            vsh.callNative(JSON.stringify(msg));
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Welcome to nginx!</h1>
+    <!-- <p>
+        If you see this page, the nginx web server is successfully installed and working. Further configuration is required.
+    </p>
+
+    <p>
+        For online documentation and support please refer to
+        <a href="http://nginx.org/">nginx.org</a>.<br /> Commercial support is available at
+        <a href="http://nginx.com/">nginx.com</a>.
+    </p>
+
+    <p><em>Thank you for using nginx.</em></p> -->
+
+    <!-- <a href="visitshanghai://openMetro">跳转metro qrcode</a> -->
+
+    <h1>44</h1>
+    <h1>33</h1>
+    <h1>22</h1>
+    <button type="button" id="button1" onclick="callNative()">
+      <h1>clickme</h1>
+    </button>
+</body>
+
+</html>

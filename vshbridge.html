@@ -11,10 +11,23 @@
         }
     </style>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
     <script>
         let uniqueId = 0;
         let callbacksFromNative = {};
+        const IS_IOS = "isIos";
+        const IS_ANDROID = "isAndroid";
+        var appType = getAppType();
+        var isIos = appType === IS_IOS;
+        var isAndroid = appType === IS_ANDROID;
 
+        function isIos() {
+            return getAppType() === IS_IOS;
+        }
+
+        function isAndroid() {
+            return getAppType() === IS_ANDROID;
+        }
         /**
          * native 调用 js 的方法，暂时不添加回调方法，作为单向调用。
          */
@@ -31,16 +44,42 @@
         }
 
         function callNativeTest() {
-            callNative(
-                "hans://demo/log", {
-                    text: "this is callNative demo/log content",
-                },
-                function(params) {
-                    vsh.log("callNativeTest callback params:" + params);
-                }
-            );
+            // window.webkit.messageHandlers.currentCookies.postMessage({
+            //     body: "buttonActionMessage",
+            // });
+
+            let bodyy =
+                "isIos:" + isIos + ",isAndroid:" + isAndroid + ",appType:" + appType;
+
+            if (isIos) {
+                window.webkit.messageHandlers.log.postMessage({
+                    body: bodyy,
+                });
+            } else if (isAndroid) {
+                callNative(
+                    "hans://demo/log", {
+                        text: bodyy,
+                    },
+                    function(params) {
+                        vsh.log("callNativeTest callback params:" + params);
+                    }
+                );
+            } else {}
         }
 
+        function getAppType() {
+            var u = navigator.userAgent;
+            var isAndroid = u.indexOf("Android") > -1 || u.indexOf("Adr") > -1; //android终端
+            var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+            // var isApp = /wehotel/.test(u) || /botao/.test(u);
+            if (isAndroid) {
+                return IS_ANDROID;
+            }
+            if (isiOS) {
+                return IS_IOS;
+            }
+            return "";
+        }
         /**
          * 处理js调用native后，native回调结果
          * */
@@ -62,6 +101,10 @@
             callbacksFromNative[msg.callbackId] = callback;
             vsh.callNative(JSON.stringify(msg));
         }
+
+        function alertAction(message) {
+            alert(message);
+        }
     </script>
 </head>
 
@@ -81,11 +124,11 @@
 
     <!-- <a href="visitshanghai://openMetro">跳转metro qrcode</a> -->
 
-    <h1>44</h1>
-    <h1>33</h1>
-    <h1>22</h1>
+    <h1>44clickme</h1>
+    <h1>33clickme</h1>
+    <h1 onclick="callNativeTest()">22clickme</h1>
     <button type="button" id="button1" onclick="callNativeTest()">
-      <h1>clickme</h1>
+      clickmeclickmeclickmeclickme
     </button>
 </body>
 
